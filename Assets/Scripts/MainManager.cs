@@ -6,6 +6,10 @@ using UnityEngine.UI;
 
 public class MainManager : MonoBehaviour
 {
+
+
+    private static MainManager instance;
+
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
@@ -22,6 +26,14 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        if (instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -33,7 +45,8 @@ public class MainManager : MonoBehaviour
                 Vector3 position = new Vector3(-1.5f + step * x, 2.5f + i * 0.3f, 0);
                 var brick = Instantiate(BrickPrefab, position, Quaternion.identity);
                 brick.PointValue = pointCountArray[i];
-                brick.onDestroyed.AddListener(AddPoint);
+              
+               
             }
         }
     }
@@ -62,6 +75,13 @@ public class MainManager : MonoBehaviour
         }
     }
 
+    public static void AddAPoint(int point)
+    {
+        if (instance != null)
+        {
+            instance.AddPoint(point);
+        }
+    }
     void AddPoint(int point)
     {
         m_Points += point;

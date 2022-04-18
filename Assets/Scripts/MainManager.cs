@@ -3,11 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
 
 
+    public TMP_Text nameLabel;
+ 
+    public TMP_Text bestLabel;
+
+
+    string bestname = "ERROR";
+    int bestScore = 0;
+
+
+    public static string nameString = "ERROR";
     private static MainManager instance;
 
     public Brick BrickPrefab;
@@ -26,6 +37,11 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        LoadPlayerPrefs();
+
+        UpdateNameLabel();
+        UpdateBestLabel(bestname, bestScore);
 
         if (instance != null)
         {
@@ -51,8 +67,26 @@ public class MainManager : MonoBehaviour
         }
     }
 
+    void UpdateNameLabel()
+    {
+        nameLabel.text = nameString;
+    }
+    void UpdateBestLabel(string name, int best)
+    {
+        bestLabel.text = "BEST SCORE: " + name + ", " + best;
+    }
+   
+
+
     private void Update()
     {
+
+        if  ( Input.GetKeyUp(KeyCode.Tab))
+        {
+            PlayerPrefs.DeleteAll();
+            Debug.Log("deleted saved prefs");
+        }
+
         if (!m_Started)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -74,6 +108,7 @@ public class MainManager : MonoBehaviour
             }
         }
     }
+   
 
     public static void AddAPoint(int point)
     {
@@ -86,8 +121,37 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+
+
+
+        if ( point > bestScore)
+        {
+            bestScore = point;
+            bestname = nameString;
+            UpdateBestLabel(bestname, bestScore);
+            SavePlayerPrefs();
+        }
     }
 
+    public void LoadPlayerPrefs()
+    {
+
+        bestname = PlayerPrefs.GetString("bestname");
+        if (bestname == null || bestname == "" || bestname == " ")
+        {
+            bestname = "NONE";
+        }
+
+        bestScore = PlayerPrefs.GetInt("bestscore");
+
+    }
+    public void SavePlayerPrefs()
+    {
+        PlayerPrefs.SetInt("bestscore", bestScore);
+        PlayerPrefs.SetString("bestname", bestname);
+        PlayerPrefs.Save();
+        Debug.Log("saved new high score!");
+    }
     public void GameOver()
     {
         m_GameOver = true;

@@ -39,7 +39,7 @@ public class StartManager : MonoBehaviour
         if (TextInputValid(text))
         {
             //save here
-
+            MainManager.nameString = text;
             SceneManager.LoadScene(1);
         }else
         {
